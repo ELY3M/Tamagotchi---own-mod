@@ -1,0 +1,6 @@
+echo "# Tamagotchi---own-mod" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/ELY3M/Tamagotchi---own-mod.git
+git push -u origin master
