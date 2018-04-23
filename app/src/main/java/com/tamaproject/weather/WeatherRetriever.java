@@ -2,7 +2,7 @@ package com.tamaproject.weather;
 
 import android.util.Log;
 
-import com.tamaproject.util.GoogleWeatherParser;
+import com.tamaproject.util.WeatherParser;
 
 /**
  * Gets the current conditions from Google given a latitude and longitude
@@ -23,7 +23,7 @@ public class WeatherRetriever
 	String s = URL + "lat=" + latitude + "&lon=" + longitude;
 	Log.i(TAG, "final weather url: " +s);
 
-	CurrentConditions cc = GoogleWeatherParser.getCurrentConditions(s);
+	CurrentConditions cc = WeatherParser.getCurrentConditions(s);
 		Log.i(TAG, "weather: " + cc);
 	return cc;
     }

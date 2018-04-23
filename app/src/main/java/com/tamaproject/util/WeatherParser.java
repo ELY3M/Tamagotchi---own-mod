@@ -24,9 +24,9 @@ import com.tamaproject.weather.CurrentConditions;
  * Google Weather API is gone now :(
  *
  */
-public class GoogleWeatherParser
+public class WeatherParser
 {
-	static String TAG = "tama GoogleWeatherParser";
+	static String TAG = "tama WeatherParser";
 
 	static String condition = "none";
 	static String main = "none";
