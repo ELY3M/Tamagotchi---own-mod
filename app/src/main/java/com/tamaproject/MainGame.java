@@ -703,6 +703,16 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 			    {
 					Log.i(TAG, "Applying item");
 				applyItem(itemToApply);
+
+					//mass clean up of poop with a showel hahahah//
+					if (itemToApply.getName().contains("Shovel")) {
+						Log.i(TAG, "cleaning up poop...");
+						for (Entity e : inPlayObjects) {
+							ipoToRemove.add((Sprite) e);
+						}
+					}
+
+
 				showNotification(itemToApply.getName() + " has been given to your Tamagotchi!");
 				itemToApply = null;
 			    }
