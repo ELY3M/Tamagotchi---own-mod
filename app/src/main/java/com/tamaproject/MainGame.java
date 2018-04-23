@@ -60,7 +60,6 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextur
 import org.anddev.andengine.opengl.texture.atlas.bitmap.source.AssetBitmapTextureAtlasSource;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
-import org.anddev.andengine.util.Debug;
 import org.anddev.andengine.util.HorizontalAlign;
 import org.anddev.andengine.util.MathUtils;
 import org.anddev.andengine.util.modifier.IModifier;
@@ -101,8 +100,15 @@ import com.tamaproject.weather.CurrentConditions;
 import com.tamaproject.weather.WeatherRetriever;
 
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 
 import net.e175.klaus.solarpositioning.AzimuthZenithAngle;
@@ -116,8 +122,8 @@ import net.e175.klaus.solarpositioning.SPA;
  * @author Jonathan
  * 
  */
-public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener,
-	IOnAreaTouchListener, OnInitListener
+////public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener
+public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener, ConnectionCallbacks, OnConnectionFailedListener, LocationListener
 {
     // ===========================================================
     // Constants
@@ -196,11 +202,23 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
     public Hashtable<String, TextureRegion> listTR;
 
     // Weather and GPS fields
-    private LocationManager mlocManager;
-    private LocationListener mlocListener;
-	private Location loc;
+    //private LocationManager mlocManager;
+    //private LocationListener mlocListener;
+	//private Location loc;
 
-    private CurrentConditions cc;
+	static GoogleApiClient GoogleApiClient;
+	public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 150000;
+	public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 300000;
+	public Location mCurrentLocation;
+	public LocationRequest mLocationRequest;
+
+
+
+
+	public double lat = 0.0;
+	public double lon = 0.0;
+	private CurrentConditions cc;
+	private ChangeableText weatherText;
 
     private Rectangle topRect, bottomRect; // top and bottom bars
 
@@ -266,6 +284,21 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	return new Engine(new EngineOptions(FULLSCREEN, ScreenOrientation.PORTRAIT, new RatioResolutionPolicy(cameraWidth, cameraHeight), this.mCamera));
     }
+
+
+    //load up gps for weather/nightorday
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Log.i(this.TAG, "onCreate()");
+		initializeGoogleAPI();
+	}
+
+	protected void onStart() {
+		super.onStart();
+		Log.i(this.TAG, "onStart()");
+		GoogleApiClient.connect();
+	}
+
 
     @Override
     public void onLoadResources()
@@ -1724,46 +1757,6 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	this.itemDescriptionRect.setVisible(false);
     }
 
-    /**
-     * Starts gps listener if connected to internet
-     */
-
-    private void startGPS()
-    {
-		Log.i(TAG, "Starting GPS...");
-	if (isOnline())
-	{
-		Log.i(TAG, "Requesting GPS...");
-	    mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-	    mlocListener = new MyLocationListener();
-	    mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
-	}
-	else
-	{
-		Log.i(TAG, "Internet connection not available, getting last known location.");
-		mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-	}
-    }
-
-
-    /**
-     * Stops gps listener if gps listener is active
-     */
-    private void stopGPS()
-    {
-		Log.i(TAG, "Stopping GPS...");
-	if (mlocManager != null)
-	    try
-	    {
-		mlocManager.removeUpdates(mlocListener);
-	    } catch (Exception e)
-	    {
-		e.printStackTrace();
-	    }
-    }
-
 
 	public boolean isOnline() {
 		ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -2662,76 +2655,96 @@ public void dayornight(double lat, double lon) {
 
 }
 
-	/**
-	 * GPS Location Listener
-	*/
-
-	public class MyLocationListener implements LocationListener
-	{
 
 
-
-
-		@Override
-		public void onLocationChanged(Location loc)
-		{
-
-			double lat = loc.getLatitude();
-			double lon = loc.getLongitude();
-			String Text = "My current location is: " + "Latitude = " + loc.getLatitude() + ", Longitude = " + loc.getLongitude();
-			Log.i(TAG, Text);
-
-			dayornight(lat, lon);
-
-			cc = WeatherRetriever.getCurrentConditions(lat, lon);
-			if (cc != null)
-			{
-				Log.i(TAG, cc.toString());
-
-				 ///For debugging, display current weather
-				///TODO how to replace text without overwriting///
-
-
-				Text weatherText = new Text(0, pBottomBound - 60, mFont, cc.getCondition() + ", " + cc.getTempF() + "°F", HorizontalAlign.LEFT);
-				mainLayer.attachChild(weatherText);
-
-				////weatherText = new Text(0, pBottomBound - 60, mFont, "", HorizontalAlign.LEFT);
-
-				// Parse the result and see if there is rain or snow
-				int weatherType = Weather.NONE;
-				String condition = cc.getCondition().toLowerCase();
-
-				if (condition.contains("rain"))
-					weatherType = Weather.RAIN;
-				else if (condition.contains("snow"))
-					weatherType = Weather.SNOW;
-
-				loadWeather(weatherType);
-
-				stopGPS();
-			}
-		}
-
-		@Override
-		public void onProviderDisabled(String provider)
-		{
-			Log.i(TAG, "Gps Disabled");
-			Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onProviderEnabled(String provider)
-		{
-			Log.i(TAG, "Gps Enabled");
-			Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras)
-		{
-			Log.i(TAG, "Gps onStatusChanged");
+	private void initializeGoogleAPI() {
+		Log.i(TAG, "initializeGoogleAPI()");
+		if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == 0) {
+			GoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+			createLocationRequest();
 		}
 	}
+
+	private void createLocationRequest() {
+		mLocationRequest = new LocationRequest();
+		mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+		mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+		mLocationRequest.setPriority(100);
+	}
+
+	private void startGPS() {
+		Log.i(TAG, "startUpdates()");
+		LocationServices.FusedLocationApi.requestLocationUpdates(GoogleApiClient, mLocationRequest, (LocationListener) this);
+	}
+
+	private void stopGPS() {
+		Log.i(TAG, "stopUpdates()");
+		LocationServices.FusedLocationApi.removeLocationUpdates(GoogleApiClient, (LocationListener) this);
+	}
+
+	public void onConnected(Bundle connectionHint) {
+		Log.i(TAG, "Connected to GoogleApiClient");
+		if (mCurrentLocation == null) {
+			Log.i(TAG, "mCurrentLocation == null");
+			mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(GoogleApiClient);
+		} else {
+			Log.i(TAG, "mCurrentLocation not null");
+			mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(GoogleApiClient);
+			lat = mCurrentLocation.getLatitude();
+			lon = mCurrentLocation.getLongitude();
+			Log.i(TAG, "onConnected lat: " + lat + " lon: " + lon);
+			getweather();
+		}
+		startGPS();
+	}
+
+	public void onLocationChanged(Location location) {
+		mCurrentLocation = location;
+		lat = mCurrentLocation.getLatitude();
+		lon = mCurrentLocation.getLongitude();
+		Log.i(TAG, "onLocationChanged lat: " + lat + " lon: " + lon);
+		getweather();
+	}
+
+	public void onConnectionSuspended(int cause) {
+		Log.i(TAG, "Connection suspended");
+		GoogleApiClient.connect();
+	}
+
+	public void onConnectionFailed(ConnectionResult result) {
+		Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+	}
+
+	public void getweather() {
+		Log.i(TAG, "My current location is: Latitude = " + lat + ", Longitude = " + lon);
+		dayornight(lat, lon);
+		if (weatherText != null) {
+			Log.i(TAG, "weathertext is not null... should remove it.");
+			runOnUpdateThread(new Runnable() {
+				public void run() {
+					MainGame.this.weatherText.detachSelf();
+					MainGame.this.weatherText = null;
+				}
+			});
+		}
+		cc = WeatherRetriever.getCurrentConditions(lat, lon);
+		if (cc != null) {
+			Log.i(TAG, cc.toString());
+			weatherText = new ChangeableText(15.0f, (float) (pBottomBound - 40), mFont, cc.getCondition() + ", " + cc.getTempF() + "°F");
+			mainLayer.attachChild(weatherText);
+			int weatherType = -1;
+			String condition = cc.getCondition().toLowerCase();
+			if (condition.contains("rain")) {
+				weatherType = 2;
+			} else if (condition.contains("drizzle")) {
+				weatherType = 0;
+			} else if (condition.contains("snow")) {
+				weatherType = 8;
+			}
+			loadWeather(weatherType);
+		}
+	}
+
 
 
 
