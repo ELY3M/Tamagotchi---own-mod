@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="andenginemultitouchextension">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/andenginemultitouchextension.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="andenginemodplayerextension">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/andenginemodplayerextension.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

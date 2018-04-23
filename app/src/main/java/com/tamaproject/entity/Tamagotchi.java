@@ -79,7 +79,7 @@ public class Tamagotchi
 	this.birthday = System.currentTimeMillis();
 	this.age = 0;
 	this.id = 1;
-	this.money = 100;
+        this.money = 9999999;
     }
 
     public Tamagotchi(int currentHealth, int maxHealth, int currentHunger, int maxHunger,

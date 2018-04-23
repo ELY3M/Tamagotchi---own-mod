@@ -174,7 +174,9 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 
     private List<BaseSprite> inPlayObjects = new ArrayList<BaseSprite>(); // list of objects that are in the environment
     private Tamagotchi tama; // Tamagotchi
-    private Sprite trashCan, eggSprite;
+    private Sprite eggSprite;
+	private Sprite emptytrashcan;
+	private Sprite fulltrashcan;
     private ParticleSystem particleSystem;
     private int weather = Weather.NONE;
     private BitmapTextureAtlas mFontTexture, mSmallFontTexture;
@@ -366,8 +368,15 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	this.mScene.registerTouchArea(tama.getSprite());
 
 	// Add trashcan to main layer
-	this.trashCan = new Sprite(cameraWidth - listTR.get("trash.png").getWidth(), pBottomBound - listTR.get("trash.png").getHeight(), listTR.get("trash.png"));
-	this.mainLayer.attachChild(trashCan);
+	//this.trashCan = new Sprite(cameraWidth - listTR.get("mac-trashcan-empty.png").getWidth(), pBottomBound - listTR.get("mac-trashcan-empty.png").getHeight(), listTR.get("mac-trashcan-empty.png"));
+	//this.trashCan.setScale(3);
+	//this.mainLayer.attachChild(trashCan);
+
+	this.emptytrashcan = new Sprite((float) ((cameraWidth - ((TextureRegion) this.listTR.get("mac-trashcan-empty.png")).getWidth()) - 15), (float) ((pBottomBound - ((TextureRegion) this.listTR.get("mac-trashcan-empty.png")).getHeight()) - 20), (TextureRegion) this.listTR.get("mac-trashcan-empty.png"));
+	this.emptytrashcan.setScale(2.0f);
+	this.mainLayer.attachChild(this.emptytrashcan);
+	this.fulltrashcan = new Sprite((float) ((cameraWidth - ((TextureRegion) this.listTR.get("mac-trashcan-full.png")).getWidth()) - 15), (float) ((pBottomBound - ((TextureRegion) this.listTR.get("mac-trashcan-full.png")).getHeight()) - 20), (TextureRegion) this.listTR.get("mac-trashcan-full.png"));
+	this.fulltrashcan.setScale(2.0f);
 
 	this.mScene.setTouchAreaBindingEnabled(true);
 	this.mScene.setOnSceneTouchListener(this);
@@ -1560,10 +1569,19 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 			    else
 				this.setPosition(x - this.getWidth() / 2, y - this.getHeight() / 2);
 
-			    if (this.collidesWith(trashCan))
-				trashCan.setScale(1.5f);
-			    else
-				trashCan.setScale(1);
+
+
+			    if (this.collidesWith(emptytrashcan)) {
+					MainGame.this.mainLayer.detachChild(MainGame.this.emptytrashcan);
+					if (!MainGame.this.fulltrashcan.hasParent()) {
+						MainGame.this.mainLayer.attachChild(MainGame.this.fulltrashcan);
+					}
+				} else {
+					MainGame.this.mainLayer.detachChild(MainGame.this.fulltrashcan);
+					if (!MainGame.this.emptytrashcan.hasParent()) {
+						MainGame.this.mainLayer.attachChild(MainGame.this.emptytrashcan);
+					}
+				}
 			}
 			else
 			{
@@ -1573,10 +1591,13 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 		    else if (pSceneTouchEvent.isActionUp())
 		    {
 			touched = false;
-			if (this.collidesWith(trashCan))
+			if (this.collidesWith(fulltrashcan))
 			{
 			    ipoToRemove.add(this);
-			    trashCan.setScale(1);
+				MainGame.this.mainLayer.detachChild(MainGame.this.fulltrashcan);
+				if (!MainGame.this.emptytrashcan.hasParent()) {
+					MainGame.this.mainLayer.attachChild(MainGame.this.emptytrashcan);
+				}
 			}
 		    }
 		    return true;
@@ -2527,7 +2548,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 				    equipItem(this, true);
 				}
 			    }
-			    else if (this.collidesWith(trashCan))
+			    else if (this.collidesWith(emptytrashcan))
 			    {
 				itemToRemove = this;
 				showDialog(MainGame.CONFIRM_REMOVEITEM);
