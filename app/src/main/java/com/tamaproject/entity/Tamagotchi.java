@@ -1,10 +1,15 @@
 package com.tamaproject.entity;
 
+import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.anddev.andengine.entity.sprite.BaseSprite;
+import org.joda.time.LocalDate;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 /**
  * Tamagotchi class. Holds all of the stats for Tamagotchi.
@@ -14,6 +19,7 @@ import org.anddev.andengine.entity.sprite.BaseSprite;
  */
 public class Tamagotchi
 {
+    String TAG = "tama Tamagotchi";
     public static final int MAX_BATTLE_LEVEL = 100;
     private int currentHealth, maxHealth;
     private int currentHunger, maxHunger;
@@ -29,6 +35,9 @@ public class Tamagotchi
 
     private BaseSprite sprite;
     private DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+    private DateFormat getmon = new SimpleDateFormat("MM");
+    private DateFormat getday = new SimpleDateFormat("dd");
+    private DateFormat getyear = new SimpleDateFormat("yyyy");
     private Calendar calendar = Calendar.getInstance();
 
     public final static int ALIVE = 1, DEAD = 0, LEVEL_UP = 2;
@@ -79,7 +88,7 @@ public class Tamagotchi
 	this.birthday = System.currentTimeMillis();
 	this.age = 0;
 	this.id = 1;
-        this.money = 9999999;
+    this.money = 9999999;
     }
 
     public Tamagotchi(int currentHealth, int maxHealth, int currentHunger, int maxHunger,
@@ -230,14 +239,39 @@ public class Tamagotchi
 	return leveled;
     }
 
+
+    private String CalcAge()
+    {
+
+
+        String setmonth = getmon.format(calendar.getTime());
+        String setday = getday.format(calendar.getTime());
+        String setyear = getyear.format(calendar.getTime());
+
+        LocalDate birthdate = new LocalDate (Integer.parseInt(setyear), Integer.parseInt(setmonth), Integer.parseInt(setday));  //Birth date
+        LocalDate now = new LocalDate();                    //Today's date
+        Period period = new Period(birthdate, now, PeriodType.yearMonthDay());
+        //Now access the values as below
+
+        int days = period.getDays();
+        int months = period.getMonths();
+        int years = period.getYears();
+
+        String myage = years +" Years, " + months + " Months, " + days + " Days old";
+        Log.i(TAG, myage);
+        return myage;
+
+    }
+
     /**
      * Gets the Tamagotchi's age by subtracting its birthday from the current time.
      * 
-     * @return The tama's age in days.
+     * @return The tama's age in years/months/days.
      */
-    public long getAge()
+    public String getAge()
     {
-	return age / (1000 * 60 * 60 * 24);
+    String currentage = CalcAge();
+    return currentage;
     }
 
     public void addToAge(long time)
@@ -385,7 +419,7 @@ public class Tamagotchi
 
     public String getStats()
     {
-	String s = "Age: " + getAge() + " days old \nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
+	String s = "Age: " + getAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
 	if (equippedItem != null)
 	    s += "\n \nEquipped Item: \n" + equippedItem.getInfo();
 	return s;

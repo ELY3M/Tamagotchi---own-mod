@@ -20,6 +20,7 @@ android {
 
 dependencies {
     compile 'com.google.android.gms:play-services:8.1.0'
+    compile 'joda-time:joda-time:2.9.9'
     compile files('libs/andengine2.jar')
     compile files('libs/andengineaugmentedrealityextension.jar')
     compile files('libs/andenginelivewallpaperextension.jar')
