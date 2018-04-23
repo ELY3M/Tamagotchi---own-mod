@@ -235,6 +235,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
     private boolean tamaDeadParticles = false;
 
     private Rectangle unequipItemButton;
+	private Rectangle changebdayButton;
     private ChangeableText backpackLabel;
     private Rectangle backpackBackground;
 

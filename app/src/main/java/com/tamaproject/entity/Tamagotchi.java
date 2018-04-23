@@ -269,10 +269,27 @@ public class Tamagotchi
      * 
      * @return The tama's age in years/months/days.
      */
-    public String getAge()
+    public long getAge()
     {
-    String currentage = CalcAge();
-    return currentage;
+
+        String setmonth = getmon.format(calendar.getTime());
+        String setday = getday.format(calendar.getTime());
+        String setyear = getyear.format(calendar.getTime());
+
+        LocalDate birthdate = new LocalDate (Integer.parseInt(setyear), Integer.parseInt(setmonth), Integer.parseInt(setday));  //Birth date
+        LocalDate now = new LocalDate();                    //Today's date
+        Period period = new Period(birthdate, now, PeriodType.yearMonthDay());
+        //Now access the values as below
+
+        //int days = period.getDays();
+        //int months = period.getMonths();
+        int years = period.getYears();
+
+        //String myage = years +" Years, " + months + " Months, " + days + " Days old";
+        //Log.i(TAG, "my birthday is "+birthday+" formatted: "+getFormattedBirthday());
+        //Log.i(TAG, myage);
+        return years;
+
     }
 
     public void addToAge(long time)
@@ -420,7 +437,7 @@ public class Tamagotchi
 
     public String getStats()
     {
-	String s = "Age: " + getAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
+	String s = "Age: " + CalcAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
 	if (equippedItem != null)
 	    s += "\n \nEquipped Item: \n" + equippedItem.getInfo();
 	return s;
