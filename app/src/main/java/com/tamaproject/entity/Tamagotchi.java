@@ -258,6 +258,7 @@ public class Tamagotchi
         int years = period.getYears();
 
         String myage = years +" Years, " + months + " Months, " + days + " Days old";
+        Log.i(TAG, "my birthday is "+birthday+" formatted: "+getFormattedBirthday());
         Log.i(TAG, myage);
         return myage;
 
