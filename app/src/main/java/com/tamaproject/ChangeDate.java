@@ -109,7 +109,7 @@ public class ChangeDate extends Activity {
             @Override
             public void onClick(View arg0) {
 
-            Log.i(TAG, "Save Button pressed!: "+newbday);
+                Log.i(TAG, "Save Button pressed!: "+newbday);
 
                 if (dbHelper != null)
                 {
@@ -126,5 +126,9 @@ public class ChangeDate extends Activity {
         });
 
     }
+
+
+
+
 
 }

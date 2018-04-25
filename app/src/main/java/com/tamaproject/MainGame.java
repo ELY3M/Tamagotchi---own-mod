@@ -1296,9 +1296,8 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 					{
 						this.setColor(1, 0.412f, 0.0196f);
 						//TODO
-						totalPlayTime += System.currentTimeMillis() - startPlayTime;
-
-						long newplaytime = tama.addToPlaytime(totalPlayTime);
+						//totalPlayTime += System.currentTimeMillis() - startPlayTime;
+						//long newplaytime = tama.addToPlaytime(totalPlayTime);
 
 						Log.i(TAG, "First Time Run? "+firstRun);
 
@@ -1328,6 +1327,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 								Log.i(TAG, "Save backpack success! " + resultBackpackSave);
 							}
 
+							/*
 							//update total playtime
 							long playtimeresult = dbHelper.saveplaytime(newplaytime, 1);
 							if (playtimeresult < 0) {
@@ -1335,6 +1335,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 							} else {
 								Log.i(TAG, "Save Playtime success! " + playtimeresult);
 							}
+							*/
 
 
 						}
@@ -1452,7 +1453,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 				changebdayButton.setPosition(stats.getX(), stats.getY() + stats.getHeight() + 75);
 				changebdayButton.setVisible(true);
 
-				saveTamaButton.setPosition(stats.getX(), stats.getY() + stats.getHeight() + 100);
+				saveTamaButton.setPosition(stats.getX(), stats.getY() + stats.getHeight() + 150);
 				saveTamaButton.setVisible(true);
 
 			openLayer(statsLayer);
