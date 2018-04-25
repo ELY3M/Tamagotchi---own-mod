@@ -28,6 +28,8 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ChangeDate" />
+        <activity
             android:name=".minigames.MiniGameListActivity"
             android:configChanges="orientation" />
         <activity

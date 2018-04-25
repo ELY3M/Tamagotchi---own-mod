@@ -28,7 +28,7 @@ public class Tamagotchi
     private int battleLevel;
     private int status;
     private long birthday;
-    private long age;
+    private long playtime;
     private int id;
     private Item equippedItem;
     private int money;
@@ -50,7 +50,7 @@ public class Tamagotchi
 
     public Tamagotchi(int currentHealth, int maxHealth, int currentHunger, int maxHunger,
 	    int currentXP, int maxXP, int currentSickness, int maxSickness, int battleLevel,
-	    int status, long birthday, Item equippedItem, long age, int id, int money)
+	    int status, long birthday, Item equippedItem, long playtime, int id, int money)
     {
 	this.currentHealth = currentHealth;
 	this.maxHealth = maxHealth;
@@ -65,7 +65,7 @@ public class Tamagotchi
 	this.birthday = birthday;
 	this.equippedItem = equippedItem;
 	this.calendar.setTimeInMillis(birthday);
-	this.age = age;
+	this.playtime = playtime;
 	this.id = id;
 	this.setMoney(money);
     }
@@ -86,7 +86,7 @@ public class Tamagotchi
 	this.battleLevel = 1;
 	this.status = Tamagotchi.ALIVE;
 	this.birthday = System.currentTimeMillis();
-	this.age = 0;
+	this.playtime = 0;
 	this.id = 1;
     this.money = 9999999;
     }
@@ -258,8 +258,8 @@ public class Tamagotchi
         int years = period.getYears();
 
         String myage = years +" Years, " + months + " Months, " + days + " Days old";
-        Log.i(TAG, "my birthday is "+birthday+" formatted: "+getFormattedBirthday());
-        Log.i(TAG, myage);
+        //Log.i(TAG, "my birthday is "+birthday+" formatted: "+getFormattedBirthday());
+        //Log.i(TAG, myage);
         return myage;
 
     }
@@ -267,34 +267,46 @@ public class Tamagotchi
     /**
      * Gets the Tamagotchi's age by subtracting its birthday from the current time.
      * 
-     * @return The tama's age in years/months/days.
+     * @return The tama's age in days
      */
     public long getAge()
     {
+        //return age / (1000 * 60 * 60 * 24);
+        return (playtime / 1000);
+    }
 
-        String setmonth = getmon.format(calendar.getTime());
-        String setday = getday.format(calendar.getTime());
-        String setyear = getyear.format(calendar.getTime());
 
-        LocalDate birthdate = new LocalDate (Integer.parseInt(setyear), Integer.parseInt(setmonth), Integer.parseInt(setday));  //Birth date
-        LocalDate now = new LocalDate();                    //Today's date
-        Period period = new Period(birthdate, now, PeriodType.yearMonthDay());
-        //Now access the values as below
+    /*
+    public void addToAge(long time)
+    {
+        Log.i(TAG, "addtoAge: age: "+playtime+ "newage: "+(playtime += time));
+        playtime += time;
+    }
+    */
 
-        //int days = period.getDays();
-        //int months = period.getMonths();
-        int years = period.getYears();
 
-        //String myage = years +" Years, " + months + " Months, " + days + " Days old";
-        //Log.i(TAG, "my birthday is "+birthday+" formatted: "+getFormattedBirthday());
-        //Log.i(TAG, myage);
-        return years;
+    public long addToPlaytime(long time) {
+
+        Log.i(TAG, "addToPlaytime: playtime: "+playtime+ " newplaytime: "+(playtime += time));
+        return playtime += time;
 
     }
 
-    public void addToAge(long time)
-    {
-	age += time;
+    public String totalplaytime() {
+
+        int years = (int) ((playtime / (1000*60*60*24*7*52*12)));
+        int months = (int) (playtime / (1000*60*60*24*7*52) % 12);
+        int weeks = (int) ((playtime / (1000*60*60*24*7)) % 52);
+        int days = (int) ((playtime / (1000*60*60*24)) % 7);
+        int hours = (int) ((playtime / (1000*60*60)) % 24);
+        int minutes = (int) ((playtime / (1000*60)) % 60);
+        int seconds = (int) (playtime / 1000) % 60;
+
+        //String playtime = years +" Years, " + months + " Months, " + weeks + " Weeks, " + days + " Days, " + hours + " Hours, " + minutes + " Minutes, " + seconds + " Seconds";
+
+        String playtime = days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+        //Log.i(TAG, playtime);
+        return playtime;
     }
 
     public int getBattleLevel()
@@ -437,7 +449,7 @@ public class Tamagotchi
 
     public String getStats()
     {
-	String s = "Age: " + CalcAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
+	String s = "Total Playtime: "+totalplaytime()+"\nAge: " + CalcAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
 	if (equippedItem != null)
 	    s += "\n \nEquipped Item: \n" + equippedItem.getInfo();
 	return s;

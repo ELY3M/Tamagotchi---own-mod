@@ -20,6 +20,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.tamaproject.entity.Item;
 import com.tamaproject.entity.Tamagotchi;
@@ -27,6 +28,7 @@ import com.tamaproject.entity.Tamagotchi;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
 
+	private static String TAG = "tama DatabaseHelper";
     /* Android's default system path of the appalication database */
     private static String DB_PATH = "/data/data/com.tamaproject/databases/";
     private static String DB_NAME = "tamagotchi";
@@ -36,7 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     /**
      * Constructor Takes and keeps a reference of the passed context in order to access the application assets and resources.
      * 
-     * @param context
+     * ///@param context
      */
     public DatabaseHelper(Context ctx) throws IOException
     {
@@ -74,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
 	if (createDb)
 	{
-	    System.out.println("Database not found, copying from assets...");
+	    Log.i(TAG, "Database not found, copying from assets...");
 	    // Open your local db as the input stream
 	    InputStream myInput = context.getAssets().open(DB_NAME);
 
@@ -143,7 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
      */
     public long insertTama(Tamagotchi t)
     {
-	System.out.println("Insert Tama");
+	Log.i(TAG, "Insert Tama");
 	ContentValues initialValues = new ContentValues();
 	initialValues.put("_id", t.getID());
 	initialValues.put("curHealth", t.getCurrentHealth());
@@ -176,7 +178,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
      */
     public int saveTama(Tamagotchi t)
     {
-	System.out.println("Save Tama");
+	Log.i(TAG, "Save Tama");
 	ContentValues args = new ContentValues();
 	args.put("_id", t.getID());
 	args.put("curHealth", t.getCurrentHealth());
@@ -197,9 +199,45 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	return db.update("Tamagotchi", args, "_id = " + t.getID(), null);
     }
 
-    public int saveMoney(int money, int id)
+	public long loadplaytime(int id)
+	{
+		try
+		{
+			Cursor c = db.rawQuery("Select age from Tamagotchi where _id = " + id, null);
+
+			if (c != null)
+			{
+				c.moveToFirst();
+			}
+
+			return c.getInt(c.getColumnIndex("age"));
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	public long saveplaytime(long playtime, int id)
+	{
+		Log.i(TAG,"Save Playtime: "+playtime);
+		ContentValues args = new ContentValues();
+		args.put("age", playtime);
+		return db.update("Tamagotchi", args, "_id =" + id, null);
+	}
+
+	public int saveBDay(long bday, int id)
+	{
+		Log.i(TAG,"Save Birthday: "+bday);
+		ContentValues args = new ContentValues();
+		args.put("birthday", bday);
+		return db.update("Tamagotchi", args, "_id =" + id, null);
+	}
+
+
+	public int saveMoney(int money, int id)
     {
-	System.out.println("Save Money");
+	Log.i(TAG,"Save Money");
 	ContentValues args = new ContentValues();
 	args.put("money", money);
 	return db.update("Tamagotchi", args, "_id =" + id, null);
@@ -347,11 +385,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
 		if (success < 0)
 		    return success;
 		else
-		    System.out.println(pair.getKey() + " saved");
+		    Log.i(TAG, pair.getKey() + " saved");
 	    }
 	    else
 	    {
-		System.out.println(pair.getKey() + " saved");
+		Log.i(TAG, pair.getKey() + " saved");
 	    }
 	}
 	return success;
@@ -365,7 +403,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
      */
     public ArrayList<Item> getBackpack(Hashtable<String, TextureRegion> table)
     {
-	System.out.println("Get Backpack");
+	Log.i(TAG, "Get Backpack");
 	try
 	{
 	    Cursor c = db.rawQuery("select * from Backpack", null);
@@ -396,7 +434,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 		    int quantity = c.getInt(c.getColumnIndex("quantity"));
 		    for (int j = 0; j < quantity; j++)
 		    {
-			System.out.println("Adding " + itemName + " to backpack");
+			Log.i(TAG, "Adding " + itemName + " to backpack");
 			Item i = new Item(0, 0, textureRegion, itemName, description, health, hunger, sickness, xp, type, protection);
 			resultSet.add(i);
 		    }
@@ -412,7 +450,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public ArrayList<Item> getAllItems(Hashtable<String, TextureRegion> table)
     {
-	System.out.println("Get All Items");
+	Log.i(TAG, "Get All Items");
 	try
 	{
 	    Cursor c = db.rawQuery("select * from Items", null);

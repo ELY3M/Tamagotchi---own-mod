@@ -901,21 +901,35 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	this.stopGPS();
 	totalPlayTime += System.currentTimeMillis() - startPlayTime;
 
-	tama.addToAge(totalPlayTime);
+	long newplaytime = tama.addToPlaytime(totalPlayTime);
+
 
 	if (dbHelper != null)
 	{
-	    long result = dbHelper.insertTama(tama);
-	    if (result < 0)
+		//bug/error here//
+	    //long result = dbHelper.insertTama(tama);
+		long result = dbHelper.saveTama(tama);  //save instead of insert!!
+	    if (result < 0) {
 			Log.i(TAG, "Save Tama failed! " + result);
-	    else
+		} else {
 			Log.i(TAG, "Save Tama success! " + result);
-
+		}
 	    long resultBackpackSave = dbHelper.insertBackpack(bp.getItems());
-	    if (resultBackpackSave < 0)
+	    if (resultBackpackSave < 0) {
 			Log.i(TAG, "Save backpack failed! " + resultBackpackSave);
-	    else
+		} else {
 			Log.i(TAG, "Save backpack success! " + resultBackpackSave);
+		}
+
+		//update total playtime
+		long ageresult = dbHelper.saveplaytime(newplaytime, 1);
+		if (ageresult < 0) {
+			Log.i(TAG, "Save Playtime failed! " + ageresult);
+		} else {
+			Log.i(TAG, "Save Playtime success! " + ageresult);
+		}
+
+
 	}
     }
 
@@ -945,10 +959,12 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	    int hours = (int) ((totalPlayTime / (1000 * 60 * 60)) % 24);
 	    int days = (int) (totalPlayTime / (1000 * 60 * 60 * 24));
 
-	    Toast.makeText(this, "Total Playtime: " + days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds", Toast.LENGTH_SHORT).show();
+	    Toast.makeText(this, "Total Playtime: " + days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds", Toast.LENGTH_LONG).show();
 
-	    if (tama != null)
-		tama.addToAge(totalPlayTime);
+	    if (tama != null) {
+			tama.addToPlaytime(totalPlayTime);
+		}
+
 
 	    stopGPS();
 	} catch (Exception e)
@@ -1224,6 +1240,40 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	mScene.registerTouchArea(unequipItemButton);
 	statsBackground.attachChild(unequipItemButton);
 
+
+
+
+		final Text changebdayText = new Text(10, 5, mSmallFont, "Change my BDay");
+		changebdayButton = new Rectangle(50, this.stats.getY() + this.stats.getHeight() + 50, changebdayText.getWidth() + 20, changebdayText.getHeight() + 10)
+		{
+			@Override
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY)
+			{
+				if (statsLayer.isVisible() && this.isVisible())
+				{
+					if (pSceneTouchEvent.isActionDown())
+						this.setColor(0, 0.659f, 0.698f);
+					else if (pSceneTouchEvent.isActionUp())
+					{
+						this.setColor(1, 0.412f, 0.0196f);
+						//TODO
+						//unequipItem();
+						Intent startdateact = new Intent(MainGame.this, ChangeDate.class);
+						startActivity(startdateact);
+
+					}
+					return true;
+				}
+				else
+					return false;
+			}
+		};
+		changebdayButton.setColor(1, 0.412f, 0.0196f);
+		changebdayButton.attachChild(changebdayText);
+		mScene.registerTouchArea(changebdayButton);
+		statsBackground.attachChild(changebdayButton);
+
+
 	/**
 	 * Draw bottom rectangle bar
 	 */
@@ -1320,6 +1370,9 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 			{
 			    unequipItemButton.setVisible(false);
 			}
+
+				changebdayButton.setPosition(stats.getX(), stats.getY() + stats.getHeight() + 75);
+				changebdayButton.setVisible(true);
 			openLayer(statsLayer);
 		    }
 		    else
@@ -2612,18 +2665,38 @@ public void dayornight(double lat, double lon) {
 
 	if (ZENITH < 90.8) {
 		Log.i(TAG, "day");
-		if (civilOverlayRect != null)
+		//make sure to unload all layers first
+		if (civilOverlayRect != null) {
 			civilOverlayRect.detachSelf();
-		if (nauticalOverlayRect != null)
+		}
+		if (nauticalOverlayRect != null) {
 			nauticalOverlayRect.detachSelf();
-		if (astroOverlayRect != null)
+		}
+		if (astroOverlayRect != null) {
 			astroOverlayRect.detachSelf();
-		if (nightOverlayRect != null)
+		}
+		if (nightOverlayRect != null) {
 			nightOverlayRect.detachSelf();
+		}
 	}
 
 	if (ZENITH >= 90.8 && ZENITH < 96) {
 		Log.i(TAG, "civil");
+
+		//make sure to unload all layers first
+		if (civilOverlayRect != null) {
+			civilOverlayRect.detachSelf();
+		}
+		if (nauticalOverlayRect != null) {
+			nauticalOverlayRect.detachSelf();
+		}
+		if (astroOverlayRect != null) {
+			astroOverlayRect.detachSelf();
+		}
+		if (nightOverlayRect != null) {
+			nightOverlayRect.detachSelf();
+		}
+
 		if (civilOverlayRect == null) {
 			civilOverlayRect = new Rectangle(0, 0, cameraWidth, cameraHeight);
 			civilOverlayRect.setColor(0, 0, 0, 0.35f);
@@ -2634,6 +2707,21 @@ public void dayornight(double lat, double lon) {
 
 	if (ZENITH >= 96 && ZENITH < 102) {
 		Log.i(TAG, "nautical");
+
+		//make sure to unload all layers first
+		if (civilOverlayRect != null) {
+			civilOverlayRect.detachSelf();
+		}
+		if (nauticalOverlayRect != null) {
+			nauticalOverlayRect.detachSelf();
+		}
+		if (astroOverlayRect != null) {
+			astroOverlayRect.detachSelf();
+		}
+		if (nightOverlayRect != null) {
+			nightOverlayRect.detachSelf();
+		}
+
 		if (nauticalOverlayRect == null) {
 			nauticalOverlayRect = new Rectangle(0, 0, cameraWidth, cameraHeight);
 			nauticalOverlayRect.setColor(0, 0, 0, 0.50f);
@@ -2644,6 +2732,21 @@ public void dayornight(double lat, double lon) {
 
 	if (ZENITH >= 102 && ZENITH < 108) {
 		Log.i(TAG, "astronomical");
+
+		//make sure to unload all layers first
+		if (civilOverlayRect != null) {
+			civilOverlayRect.detachSelf();
+		}
+		if (nauticalOverlayRect != null) {
+			nauticalOverlayRect.detachSelf();
+		}
+		if (astroOverlayRect != null) {
+			astroOverlayRect.detachSelf();
+		}
+		if (nightOverlayRect != null) {
+			nightOverlayRect.detachSelf();
+		}
+
 		if (astroOverlayRect == null) {
 			astroOverlayRect = new Rectangle(0, 0, cameraWidth, cameraHeight);
 			astroOverlayRect.setColor(0, 0, 0, 0.65f);
@@ -2654,6 +2757,21 @@ public void dayornight(double lat, double lon) {
 
 	if (ZENITH >= 108) {
 		Log.i(TAG, "night");
+
+		//make sure to unload all layers first
+		if (civilOverlayRect != null) {
+			civilOverlayRect.detachSelf();
+		}
+		if (nauticalOverlayRect != null) {
+			nauticalOverlayRect.detachSelf();
+		}
+		if (astroOverlayRect != null) {
+			astroOverlayRect.detachSelf();
+		}
+		if (nightOverlayRect != null) {
+			nightOverlayRect.detachSelf();
+		}
+
 		if (nightOverlayRect == null) {
 			nightOverlayRect = new Rectangle(0, 0, cameraWidth, cameraHeight);
 			nightOverlayRect.setColor(0, 0, 0, 0.75f);
