@@ -201,10 +201,6 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
     // TextureRegions
     public Hashtable<String, TextureRegion> listTR;
 
-    // Weather and GPS fields
-    //private LocationManager mlocManager;
-    //private LocationListener mlocListener;
-	//private Location loc;
 
 	static GoogleApiClient GoogleApiClient;
 	public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 150000;
@@ -236,6 +232,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 
     private Rectangle unequipItemButton;
 	private Rectangle changebdayButton;
+	private Rectangle saveTamaButton;
     private ChangeableText backpackLabel;
     private Rectangle backpackBackground;
 
@@ -1268,8 +1265,6 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 					else if (pSceneTouchEvent.isActionUp())
 					{
 						this.setColor(1, 0.412f, 0.0196f);
-						//TODO
-						//unequipItem();
 						Intent startdateact = new Intent(MainGame.this, ChangeDate.class);
 						startActivity(startdateact);
 
@@ -1284,6 +1279,77 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 		changebdayButton.attachChild(changebdayText);
 		mScene.registerTouchArea(changebdayButton);
 		statsBackground.attachChild(changebdayButton);
+
+
+		//save Tama manual
+		final Text saveTamaText = new Text(10, 5, mSmallFont, "Save Tama");
+		saveTamaButton = new Rectangle(50, this.stats.getY() + this.stats.getHeight() + 50, changebdayText.getWidth() + 20, changebdayText.getHeight() + 10)
+		{
+			@Override
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY)
+			{
+				if (statsLayer.isVisible() && this.isVisible())
+				{
+					if (pSceneTouchEvent.isActionDown())
+						this.setColor(0, 0.659f, 0.698f);
+					else if (pSceneTouchEvent.isActionUp())
+					{
+						this.setColor(1, 0.412f, 0.0196f);
+						//TODO
+						totalPlayTime += System.currentTimeMillis() - startPlayTime;
+
+						long newplaytime = tama.addToPlaytime(totalPlayTime);
+
+						Log.i(TAG, "First Time Run? "+firstRun);
+
+						if (dbHelper != null)
+						{
+
+							long result;
+							if (firstRun == true) {
+								Log.i(TAG, "First Time Run - inserting");
+								result = dbHelper.insertTama(tama);
+							} else {
+								Log.i(TAG, "saveTama");
+								result = dbHelper.saveTama(tama);
+							}
+							if (result < 0) {
+								Log.i(TAG, "Save Tama failed! " + result);
+							} else {
+								Log.i(TAG, "Save Tama success! " + result);
+							}
+
+
+
+							long resultBackpackSave = dbHelper.insertBackpack(bp.getItems());
+							if (resultBackpackSave < 0) {
+								Log.i(TAG, "Save backpack failed! " + resultBackpackSave);
+							} else {
+								Log.i(TAG, "Save backpack success! " + resultBackpackSave);
+							}
+
+							//update total playtime
+							long playtimeresult = dbHelper.saveplaytime(newplaytime, 1);
+							if (playtimeresult < 0) {
+								Log.i(TAG, "Save Playtime failed! " + playtimeresult);
+							} else {
+								Log.i(TAG, "Save Playtime success! " + playtimeresult);
+							}
+
+
+						}
+
+					}
+					return true;
+				}
+				else
+					return false;
+			}
+		};
+		saveTamaButton.setColor(1, 0.412f, 0.0196f);
+		saveTamaButton.attachChild(saveTamaText);
+		mScene.registerTouchArea(saveTamaButton);
+		statsBackground.attachChild(saveTamaButton);
 
 
 	/**
@@ -1385,6 +1451,10 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 
 				changebdayButton.setPosition(stats.getX(), stats.getY() + stats.getHeight() + 75);
 				changebdayButton.setVisible(true);
+
+				saveTamaButton.setPosition(stats.getX(), stats.getY() + stats.getHeight() + 100);
+				saveTamaButton.setVisible(true);
+
 			openLayer(statsLayer);
 		    }
 		    else
