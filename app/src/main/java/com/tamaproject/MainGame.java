@@ -903,17 +903,27 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 
 	long newplaytime = tama.addToPlaytime(totalPlayTime);
 
+	Log.i(TAG, "First Time Run? "+firstRun);
 
 	if (dbHelper != null)
 	{
-		//bug/error here//
-	    //long result = dbHelper.insertTama(tama);
-		long result = dbHelper.saveTama(tama);  //save instead of insert!!
+
+		long result;
+		if (firstRun == true) {
+			Log.i(TAG, "First Time Run - inserting");
+			result = dbHelper.insertTama(tama);
+		} else {
+			Log.i(TAG, "saveTama");
+			result = dbHelper.saveTama(tama);
+		}
 	    if (result < 0) {
 			Log.i(TAG, "Save Tama failed! " + result);
 		} else {
 			Log.i(TAG, "Save Tama success! " + result);
 		}
+
+
+
 	    long resultBackpackSave = dbHelper.insertBackpack(bp.getItems());
 	    if (resultBackpackSave < 0) {
 			Log.i(TAG, "Save backpack failed! " + resultBackpackSave);
@@ -922,11 +932,11 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 		}
 
 		//update total playtime
-		long ageresult = dbHelper.saveplaytime(newplaytime, 1);
-		if (ageresult < 0) {
-			Log.i(TAG, "Save Playtime failed! " + ageresult);
+		long playtimeresult = dbHelper.saveplaytime(newplaytime, 1);
+		if (playtimeresult < 0) {
+			Log.i(TAG, "Save Playtime failed! " + playtimeresult);
 		} else {
-			Log.i(TAG, "Save Playtime success! " + ageresult);
+			Log.i(TAG, "Save Playtime success! " + playtimeresult);
 		}
 
 
@@ -961,9 +971,11 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 
 	    Toast.makeText(this, "Total Playtime: " + days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds", Toast.LENGTH_LONG).show();
 
+		/*
 	    if (tama != null) {
 			tama.addToPlaytime(totalPlayTime);
 		}
+		*/
 
 
 	    stopGPS();
@@ -1762,7 +1774,9 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	 * Load backpack background
 	 */
 	backpackBackground = new Rectangle(0, 0, cameraWidth, pBottomBound);
-	backpackBackground.setColor(87 / 255f, 57 / 255f, 20 / 255f);
+	//backpackBackground.setColor(87 / 255f, 57 / 255f, 20 / 255f);
+	//backpackBackground.setColor(103 / 255f, 130 / 255f, 163 / 255f); //blue+gray
+	backpackBackground.setColor(30 / 255f, 73 / 255f, 93 / 255f);
 	backpackLayer.attachChild(backpackBackground);
 
 	backpackLabel = new ChangeableText(15, 15, mFont, "Backpack (" + bp.numItems() + "/" + bp.maxSize() + ")", HorizontalAlign.LEFT, 30);

@@ -240,7 +240,7 @@ public class Tamagotchi
     }
 
 
-    private String CalcAge()
+    private String getAge()
     {
 
 
@@ -265,30 +265,21 @@ public class Tamagotchi
     }
 
     /**
-     * Gets the Tamagotchi's age by subtracting its birthday from the current time.
      * 
-     * @return The tama's age in days
+     * @return The tama's playtime in milliseconds
      */
-    public long getAge()
+    public long getPlaytime()
     {
         //return age / (1000 * 60 * 60 * 24);
-        return (playtime / 1000);
+        return playtime;
     }
-
-
-    /*
-    public void addToAge(long time)
-    {
-        Log.i(TAG, "addtoAge: age: "+playtime+ "newage: "+(playtime += time));
-        playtime += time;
-    }
-    */
 
 
     public long addToPlaytime(long time) {
 
-        Log.i(TAG, "addToPlaytime: playtime: "+playtime+ " newplaytime: "+(playtime += time));
-        return playtime += time;
+        long totalplaytime = (playtime += time);
+        Log.i(TAG, "addToPlaytime: playtime: "+playtime+ " newplaytime: "+totalplaytime);
+        return totalplaytime;
 
     }
 
@@ -449,7 +440,7 @@ public class Tamagotchi
 
     public String getStats()
     {
-	String s = "Total Playtime: "+totalplaytime()+"\nAge: " + CalcAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
+	String s = "Total Playtime: "+totalplaytime()+"\nAge: " + getAge() + "\nHealth: " + currentHealth + "/" + maxHealth + "\nSickness: " + currentSickness + "/" + maxSickness + "\nHunger: " + currentHunger + "/" + maxHunger + "\nExperience: " + currentXP + "/" + maxXP + "\nBattle Level: " + battleLevel + "\nBirthday: " + getFormattedBirthday() + "\nMoney: $" + money;
 	if (equippedItem != null)
 	    s += "\n \nEquipped Item: \n" + equippedItem.getInfo();
 	return s;

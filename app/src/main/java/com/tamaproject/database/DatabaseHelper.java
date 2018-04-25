@@ -161,7 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	initialValues.put("status", t.getStatus());
 	initialValues.put("birthday", t.getBirthday());
 	initialValues.put("equippedItem", t.getEquippedItemName());
-	initialValues.put("age", t.getAge());
+	initialValues.put("playtime", t.getPlaytime());
 	initialValues.put("money", t.getMoney());
 	long success = db.insert("Tamagotchi", null, initialValues);
 	if (success < 0)
@@ -194,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	args.put("status", t.getStatus());
 	args.put("birthday", t.getBirthday());
 	args.put("equippedItem", t.getEquippedItemName());
-	args.put("age", t.getAge());
+	args.put("playtime", t.getPlaytime());
 	args.put("money", t.getMoney());
 	return db.update("Tamagotchi", args, "_id = " + t.getID(), null);
     }
@@ -203,14 +203,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	{
 		try
 		{
-			Cursor c = db.rawQuery("Select age from Tamagotchi where _id = " + id, null);
+			Cursor c = db.rawQuery("Select playtime from Tamagotchi where _id = " + id, null);
 
 			if (c != null)
 			{
 				c.moveToFirst();
 			}
 
-			return c.getInt(c.getColumnIndex("age"));
+			return c.getInt(c.getColumnIndex("playtime"));
 		} catch (Exception e)
 		{
 			e.printStackTrace();
@@ -222,7 +222,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	{
 		Log.i(TAG,"Save Playtime: "+playtime);
 		ContentValues args = new ContentValues();
-		args.put("age", playtime);
+		args.put("playtime", playtime);
 		return db.update("Tamagotchi", args, "_id =" + id, null);
 	}
 
@@ -291,12 +291,12 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	    int battleLevel = c.getInt(c.getColumnIndex("battleLevel"));
 	    int status = c.getInt(c.getColumnIndex("status"));
 	    long birthday = c.getLong(c.getColumnIndex("birthday"));
-	    long age = c.getLong(c.getColumnIndex("age"));
+	    long playtime = c.getLong(c.getColumnIndex("playtime"));
 	    int money = c.getInt(c.getColumnIndex("money"));
 	    Item equippedItem = null;
 	    if ("None".equals(c.getString(c.getColumnIndex("equippedItem"))))
 	    {
-		return new Tamagotchi(curHealth, maxHealth, curHunger, maxHunger, curXP, maxXP, curSickness, maxSickness, battleLevel, status, birthday, null, age, id, money);
+		return new Tamagotchi(curHealth, maxHealth, curHunger, maxHunger, curXP, maxXP, curSickness, maxSickness, battleLevel, status, birthday, null, playtime, id, money);
 	    }
 	    else
 	    {
@@ -320,7 +320,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 		    equippedItem = new Item(0, 0, textureRegion, equippedItemName, description, health, hunger, sickness, xp, type, protection);
 		}
 
-		return new Tamagotchi(curHealth, maxHealth, curHunger, maxHunger, curXP, maxXP, curSickness, maxSickness, battleLevel, status, birthday, equippedItem, age, id, money);
+		return new Tamagotchi(curHealth, maxHealth, curHunger, maxHunger, curXP, maxXP, curSickness, maxSickness, battleLevel, status, birthday, equippedItem, playtime, id, money);
 	    }
 
 	} catch (Exception e)
