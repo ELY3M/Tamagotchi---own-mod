@@ -79,7 +79,9 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 
@@ -116,6 +118,12 @@ import net.e175.klaus.solarpositioning.Grena3;
 import net.e175.klaus.solarpositioning.PSA;
 import net.e175.klaus.solarpositioning.SPA;
 
+import android.support.v4.view.GestureDetectorCompat;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+
+import static java.lang.Math.abs;
+
 /**
  * Main game that controls Tamagotchi behavior, item interaction, etc.
  * 
@@ -123,7 +131,7 @@ import net.e175.klaus.solarpositioning.SPA;
  * 
  */
 ////public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener
-public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener, ConnectionCallbacks, OnConnectionFailedListener, LocationListener
+public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener, ConnectionCallbacks, OnConnectionFailedListener, LocationListener, GestureDetector.OnGestureListener
 {
     // ===========================================================
     // Constants
@@ -261,6 +269,9 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 
     private boolean demoMode = true;
 
+
+	private GestureDetectorCompat mDetector;
+
     // ===========================================================
     // Methods for/from SuperClass/Interfaces
     // ===========================================================
@@ -289,6 +300,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 		super.onCreate(savedInstanceState);
 		Log.i(this.TAG, "onCreate()");
 		initializeGoogleAPI();
+		mDetector = new GestureDetectorCompat(this,this);
 	}
 
 	protected void onStart() {
@@ -889,6 +901,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	}
 	return super.onKeyDown(pKeyCode, pEvent);
     }
+
 
     @Override
     public void onPause()
@@ -1823,7 +1836,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	    final Item killTama = new GameItem(0, 0, this.listTR.get("skull.png"), "Kill Tama", "This item kills the Tamagotchi.", -10000, 0, 0, 0);
 	    this.bp.addItem(killTama);
 
-	    for (int i = 0; i < 26; i++)
+	    for (int i = 0; i < 9; i++)
 		{
 		Item item = new GameItem(0, 0, this.listTR.get("apple.png"), "Apple", 7, -100, -100, 10);
 		this.bp.addItem(item);
@@ -1918,6 +1931,7 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	}
 
 
+	//TODO: add more precip types//
     /**
      * Loads the selected weather into the environment.
      * 
@@ -2929,6 +2943,24 @@ public void dayornight(double lat, double lon) {
 		Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
 	}
 
+	/*
+	*
+
+	public static final int DRIZZLE = 0;
+    public static final int HAIL = 6;
+    public static final int HYRAIN = 3;
+    public static final int HYSNOW = 9;
+    public static final int ICEPELLETS = 5;
+    public static final int LTRAIN = 1;
+    public static final int LTSNOW = 7;
+    public static final int NONE = -1;
+    public static final int RAIN = 2;
+    public static final int SNOW = 8;
+    public static final int THUNDERSTORM = 4;
+    public static final int UNKNOWN = 10;
+
+	* */
+
 	public void getweather() {
 		Log.i(TAG, "My current location is: Latitude = " + lat + ", Longitude = " + lon);
 		dayornight(lat, lon);
@@ -2941,7 +2973,12 @@ public void dayornight(double lat, double lon) {
 				}
 			});
 		}
-		cc = WeatherRetriever.getCurrentConditions(lat, lon);
+		if(isOnline()) {
+			cc = WeatherRetriever.getCurrentConditions(lat, lon);
+			Log.i(TAG, "cc: "+cc);
+		} else {
+			cc = null;
+		}
 		if (cc != null) {
 			Log.i(TAG, cc.toString());
 			weatherText = new ChangeableText(15.0f, (float) (pBottomBound - 40), mFont, cc.getCondition() + ", " + cc.getTempF() + "°F");
@@ -2956,10 +2993,63 @@ public void dayornight(double lat, double lon) {
 				weatherType = 8;
 			}
 			loadWeather(weatherType);
+		} else {
+			weatherText = new ChangeableText(15.0f, (float) (pBottomBound - 40), mFont, "Weather not available");
+			mainLayer.attachChild(weatherText);
 		}
 	}
 
 
+	///gesturelistener///
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		this.mDetector.onTouchEvent(event);
+		return super.onTouchEvent(event);
+	}
+
+	@Override
+	public boolean onDown(MotionEvent arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+		final float scale = getResources().getDisplayMetrics().density;
+		if (abs(e1.getY() - e2.getY()) > (40.0 * scale)) {
+			//BaseAndEngineGame.openOptionsMenu();
+			Log.i(TAG, "onFling - swiped!!!");
+		}
+		return true;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 
 }
+
+

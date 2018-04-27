@@ -10,13 +10,20 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Hashtable;
+
 import com.tamaproject.database.DatabaseHelper;
+import com.tamaproject.entity.Tamagotchi;
+
+import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
 
 public class ChangeDate extends Activity {
 
     String TAG = "tama ChangeDate";
     private DatabaseHelper dbHelper;
+    private Tamagotchi tama;
+    public Hashtable<String, TextureRegion> listTR;
     long newbday = 0;
     Button button;
 
@@ -102,7 +109,6 @@ public class ChangeDate extends Activity {
         }
 
 
-
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -110,6 +116,9 @@ public class ChangeDate extends Activity {
             public void onClick(View arg0) {
 
                 Log.i(TAG, "Save Button pressed!: "+newbday);
+                tama = dbHelper.loadTama(1, listTR);
+                tama.setBirthday(newbday);
+
 
                 if (dbHelper != null)
                 {
@@ -119,7 +128,17 @@ public class ChangeDate extends Activity {
                     {
                         Log.i(TAG, "Save Birthday failed! " + savebdayResult);
                     }
+
+                    Log.i(TAG, "saveTama");
+                    long result = dbHelper.saveTama(tama);
+                    if (result < 0) {
+                        Log.i(TAG, "Save Tama failed! " + result);
+                    } else {
+                        Log.i(TAG, "Save Tama success! " + result);
+                    }
+
                 }
+
 
             }
 
@@ -127,7 +146,7 @@ public class ChangeDate extends Activity {
 
     }
 
-
+//TODO figure out how to save whole tama here//
 
 
 

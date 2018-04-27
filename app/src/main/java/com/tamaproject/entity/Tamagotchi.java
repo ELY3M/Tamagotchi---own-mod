@@ -7,9 +7,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.anddev.andengine.entity.sprite.BaseSprite;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
 import org.joda.time.LocalDate;
+import org.joda.time.Minutes;
+import org.joda.time.Months;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+import org.joda.time.Seconds;
+import org.joda.time.Weeks;
+import org.joda.time.Years;
 
 /**
  * Tamagotchi class. Holds all of the stats for Tamagotchi.
@@ -35,8 +43,12 @@ public class Tamagotchi
 
     private BaseSprite sprite;
     private DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-    private DateFormat getmon = new SimpleDateFormat("MM");
+
+    private DateFormat getsec = new SimpleDateFormat("s");
+    private DateFormat getmin = new SimpleDateFormat("m");
+    private DateFormat gethour = new SimpleDateFormat("k"); //0 to 23
     private DateFormat getday = new SimpleDateFormat("dd");
+    private DateFormat getmon = new SimpleDateFormat("MM");
     private DateFormat getyear = new SimpleDateFormat("yyyy");
     private Calendar calendar = Calendar.getInstance();
 
@@ -244,20 +256,49 @@ public class Tamagotchi
     {
 
 
-        String setmonth = getmon.format(calendar.getTime());
+
+        String setsecond = getsec.format(calendar.getTime());
+        String setmin = getmin.format(calendar.getTime());
+        String sethour = gethour.format(calendar.getTime());
         String setday = getday.format(calendar.getTime());
+        String setmonth = getmon.format(calendar.getTime());
         String setyear = getyear.format(calendar.getTime());
 
-        LocalDate birthdate = new LocalDate (Integer.parseInt(setyear), Integer.parseInt(setmonth), Integer.parseInt(setday));  //Birth date
+        LocalDate birthdate = new LocalDate(Integer.parseInt(setyear), Integer.parseInt(setmonth), Integer.parseInt(setday));  //Birth date
+        //LocalDate birthtime = new LocalDate(Integer.parseInt(sethour), Integer.parseInt(setmin), Integer.parseInt(setsecond)); //Birth time
         LocalDate now = new LocalDate();                    //Today's date
-        Period period = new Period(birthdate, now, PeriodType.yearMonthDay());
+        Period getdate = new Period(birthdate, now, PeriodType.yearMonthDay());
+        //Period gettime = new Period(birthtime, now, PeriodType.dayTime());
         //Now access the values as below
 
-        int days = period.getDays();
-        int months = period.getMonths();
-        int years = period.getYears();
+        //int seconds = gettime.getSeconds();
+        //int minutes = gettime.getMinutes();
+        //int hours = gettime.getHours();
+        int days = getdate.getDays();
+        int months = getdate.getMonths();
+        int years = getdate.getYears();
 
-        String myage = years +" Years, " + months + " Months, " + days + " Days old";
+
+
+
+        /*
+        DateTime birthdate = new DateTime(Long.valueOf(birthday));
+        DateTime now = new DateTime();
+        Period period = new Period(birthdate, now);
+        DateTime calc = birthdate.plus(period);
+        Seconds seconds = Seconds.secondsBetween(birthdate, now);
+        Minutes minutes = Minutes.minutesBetween(birthdate, now);
+        Hours hours = Hours.hoursBetween(birthdate, now);
+        Days days = Days.daysBetween(birthdate, now);
+        Weeks weeks = Weeks.weeksBetween(birthdate, now);
+        Months months = Months.monthsBetween(birthdate, now);
+        Years years = Years.yearsBetween(birthdate, now);
+        */
+
+        //String myage = years +" Years, " + months + " Months, " + days + " Days, " + hours + " Hours, " + minutes + " Minutes, " + seconds + " Seconds";
+
+        String myage = years +" Years, " + months + " Months, " + days + " Days";
+
         //Log.i(TAG, "my birthday is "+birthday+" formatted: "+getFormattedBirthday());
         //Log.i(TAG, myage);
         return myage;
@@ -270,7 +311,6 @@ public class Tamagotchi
      */
     public long getPlaytime()
     {
-        //return age / (1000 * 60 * 60 * 24);
         return playtime;
     }
 
@@ -293,9 +333,8 @@ public class Tamagotchi
         int minutes = (int) ((playtime / (1000*60)) % 60);
         int seconds = (int) (playtime / 1000) % 60;
 
-        //String playtime = years +" Years, " + months + " Months, " + weeks + " Weeks, " + days + " Days, " + hours + " Hours, " + minutes + " Minutes, " + seconds + " Seconds";
-
-        String playtime = days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+        String playtime = years +" Years, " + months + " Months, " + weeks + " Weeks, " + days + " Days, " + hours + " Hours, " + minutes + " Minutes, " + seconds + " Seconds";
+        //String playtime = days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
         //Log.i(TAG, playtime);
         return playtime;
     }
@@ -322,7 +361,8 @@ public class Tamagotchi
 
     public void setBirthday(long birthday)
     {
-	this.birthday = birthday;
+	    Log.i(TAG, "setBirthday: "+birthday);
+        this.birthday = birthday;
     }
 
     public int getID()
