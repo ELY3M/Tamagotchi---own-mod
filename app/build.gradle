@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "27.0.3"
+    compileSdkVersion 29
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.tamaproject"
-        minSdkVersion 12
-        targetSdkVersion 23
+        minSdkVersion 21
+        targetSdkVersion 29
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -19,15 +20,15 @@ android {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services:8.1.0'
-    compile 'joda-time:joda-time:2.9.9'
-    compile files('libs/andengine2.jar')
-    compile files('libs/andengineaugmentedrealityextension.jar')
-    compile files('libs/andenginelivewallpaperextension.jar')
-    compile files('libs/andenginemodplayerextension.jar')
-    compile files('libs/andenginemultiplayerextension.jar')
-    compile files('libs/andenginemultitouchextension.jar')
-    compile files('libs/andenginephysicsbox2dextension.jar')
-    compile files('libs/andenginesvgtextureregionextension.jar')
-    compile files('libs/andenginetexturepackerextension.jar')
+    implementation 'com.google.android.gms:play-services:12.0.1'
+    implementation 'joda-time:joda-time:2.9.9'
+    implementation files('libs/andengine2.jar')
+    implementation files('libs/andengineaugmentedrealityextension.jar')
+    implementation files('libs/andenginelivewallpaperextension.jar')
+    implementation files('libs/andenginemodplayerextension.jar')
+    implementation files('libs/andenginemultiplayerextension.jar')
+    implementation files('libs/andenginemultitouchextension.jar')
+    implementation files('libs/andenginephysicsbox2dextension.jar')
+    implementation files('libs/andenginesvgtextureregionextension.jar')
+    implementation files('libs/andenginetexturepackerextension.jar')
 }

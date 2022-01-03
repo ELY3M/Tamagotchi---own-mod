@@ -14,13 +14,12 @@ public class WeatherRetriever
 {
 	static String TAG = "tama WeatherRetriever";
     //private static final String XML_SOURCE = "http://www.google.com/ig/api?weather=,,,";
-	private static final String URL = "http://api.openweathermap.org/data/2.5/weather?&units=imperial&appid=203f88cca6d4acd6e36630ad9f5b2c5e&";
-	//http://api.openweathermap.org/data/2.5/weather?&units=imperial&mode=xml&appid=203f88cca6d4acd6e36630ad9f5b2c5e&lat=40.104&lon=-75.458
+	//https://forecast.weather.gov/MapClick.php?lat=44.9055&lon=-122.8107&lg=english&FcstType=json
+	private static final String URL = "https://forecast.weather.gov/MapClick.php?";
 
     public static CurrentConditions getCurrentConditions(double latitude, double longitude)
     {
-
-	String s = URL + "lat=" + latitude + "&lon=" + longitude;
+	String s = URL + "lat=" + latitude + "&lon=" + longitude + "&lg=english&FcstType=json";
 	Log.i(TAG, "final weather url: " +s);
 
 	CurrentConditions cc = WeatherParser.getCurrentConditions(s);

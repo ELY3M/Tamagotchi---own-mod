@@ -29,7 +29,7 @@ public class WeatherParser
 	static String TAG = "tama WeatherParser";
 
 	static String condition = "none";
-	static String main = "none";
+	//static String main = "none";
 	static String temperature = "0";
 
 	public static CurrentConditions getCurrentConditions(String url)
@@ -41,12 +41,12 @@ public class WeatherParser
 		obj.fetchJSON();
 		while (obj.parsingComplete) ;
 		condition = obj.getWeather();
-		main = obj.getmain();
+		//main = obj.getmain();
 		temperature = obj.getTemp();
-		Log.i(TAG, "condition: " + condition + " main: " + main + " temp: " + temperature);
+		Log.i(TAG, "condition: " + condition + " temp: " + temperature);
 		double finaltemp = Math.ceil(Double.valueOf(temperature));
 		cc.setCondition(condition);
-		cc.setMain(main);
+		//cc.setMain(main);
 		cc.setTempF((int)finaltemp);
 
 		Log.i(TAG,  "cc: " + cc);

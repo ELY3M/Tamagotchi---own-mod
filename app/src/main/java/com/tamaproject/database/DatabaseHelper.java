@@ -196,6 +196,30 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	args.put("equippedItem", t.getEquippedItemName());
 	args.put("playtime", t.getPlaytime());
 	args.put("money", t.getMoney());
+
+	String savelist =
+		"curHealth: " + t.getCurrentHealth()+"\n"+
+		"maxHealth: " + t.getMaxHealth()+"\n"+
+		"curHunger: " + t.getCurrentHunger()+"\n"+
+		"maxHunger: " + t.getMaxHunger()+"\n"+
+		"curXP: " + t.getCurrentXP()+"\n"+
+		"maxXP: " + t.getMaxXP()+"\n"+
+		"curSickness: " + t.getCurrentSickness()+"\n"+
+		"maxSickness: " + t.getMaxSickness()+"\n"+
+	/* initialValues.put(colPoop, ); */
+		"battleLevel" + t.getBattleLevel()+"\n"+
+		"status: " + t.getStatus()+"\n"+
+		"birthday: " + t.getBirthday()+"\n"+
+		"equippedItem: " + t.getEquippedItemName()+"\n"+
+		"playtime: " + t.getPlaytime()+"\n"+
+		"money: " + t.getMoney()+"\n";
+
+	Log.i(TAG, "Save Tama List!\n"+savelist);
+
+
+
+
+
 	return db.update("Tamagotchi", args, "_id = " + t.getID(), null);
     }
 

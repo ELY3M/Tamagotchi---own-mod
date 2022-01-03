@@ -64,11 +64,13 @@ import org.anddev.andengine.util.HorizontalAlign;
 import org.anddev.andengine.util.MathUtils;
 import org.anddev.andengine.util.modifier.IModifier;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
@@ -112,15 +114,14 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-
 import net.e175.klaus.solarpositioning.AzimuthZenithAngle;
 import net.e175.klaus.solarpositioning.Grena3;
 import net.e175.klaus.solarpositioning.PSA;
 import net.e175.klaus.solarpositioning.SPA;
 
-import android.support.v4.view.GestureDetectorCompat;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 
 import static java.lang.Math.abs;
 
@@ -133,6 +134,9 @@ import static java.lang.Math.abs;
 ////public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener
 public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener, IOnAreaTouchListener, OnInitListener, ConnectionCallbacks, OnConnectionFailedListener, LocationListener, GestureDetector.OnGestureListener
 {
+
+
+	public static final int PERMISSIONS = 1;
     // ===========================================================
     // Constants
     // ===========================================================
@@ -294,11 +298,49 @@ public class MainGame extends BaseAndEngineGame implements IOnSceneTouchListener
 	return new Engine(new EngineOptions(FULLSCREEN, ScreenOrientation.PORTRAIT, new RatioResolutionPolicy(cameraWidth, cameraHeight), this.mCamera));
     }
 
+	private  boolean checkAndRequestPermissions() {
+		int internetPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
+		int cameraPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+		int locationPermission1 = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+		int locationPermission2 = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+
+		List<String> listPermissionsNeeded = new ArrayList<>();
+
+		if (internetPermission != PackageManager.PERMISSION_GRANTED) {
+			listPermissionsNeeded.add(Manifest.permission.INTERNET);
+		}
+
+		if (locationPermission1 != PackageManager.PERMISSION_GRANTED) {
+			listPermissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+		}
+
+		if (locationPermission2 != PackageManager.PERMISSION_GRANTED) {
+			listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+		}
+
+		if (cameraPermission != PackageManager.PERMISSION_GRANTED) {
+			listPermissionsNeeded.add(Manifest.permission.CAMERA);
+		}
+
+		if (!listPermissionsNeeded.isEmpty()) {
+			ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), PERMISSIONS);
+			return false;
+		}
+
+		return true;
+	}
+
 
     //load up gps for weather/nightorday
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(this.TAG, "onCreate()");
+
+		if(checkAndRequestPermissions()) {
+			// carry on the normal flow, as the case of  permissions  granted.
+		}
+
 		initializeGoogleAPI();
 		mDetector = new GestureDetectorCompat(this,this);
 	}

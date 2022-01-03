@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Tamagotchi-own.iml" filepath="$PROJECT_DIR$/Tamagotchi-own.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Tamagotchi---own-mod.iml" filepath="$PROJECT_DIR$/.idea/modules/Tamagotchi---own-mod.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Tamagotchi---own-mod.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Tamagotchi---own-mod.app.iml" />
     </modules>
   </component>
 </project>
